@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022", 
+    "module": "NodeNext", // Para usar import/export en Node.js
+    "moduleResolution": "NodeNext",
+
+    "rootDir": "./src",  //codigo fuente
+    "outDir": "./dist",  // Archivos compilados
+
+    "strict": true, 
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/**/*"  
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
