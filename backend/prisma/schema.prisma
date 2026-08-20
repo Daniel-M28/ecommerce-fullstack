@@ -8,6 +8,8 @@ generator client {
   output   = "../src/generated/prisma"
 }
 
+
+
 datasource db {
   provider = "postgresql"
 }
@@ -87,6 +89,7 @@ enum OrderStatus {
   DELIVERED
   CANCELLED
 }
+
 
 
 model Order {
