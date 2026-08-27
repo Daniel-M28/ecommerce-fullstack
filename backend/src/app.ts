@@ -1,7 +1,10 @@
 import express from "express";
 import healthRouter from "./routes/health.routes.js"
 import categoryRoutes from "./routes/category.routes.js";
+import productRoutes from "./routes/product.routes.js";
+import productImageRoutes from "./routes/product-image.routes.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
+
 const app = express();
 
 //Midleware para interpretar JSON
@@ -11,6 +14,12 @@ app.use(express.json());
 app.use("/api", healthRouter);
 
 app.use("/api/categories", categoryRoutes);
+
+app.use("/api/products", productImageRoutes);
+
+app.use("/api/products", productRoutes);
+
+
 
 //middleware de manejo de errores
 
