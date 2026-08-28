@@ -3,6 +3,8 @@ import healthRouter from "./routes/health.routes.js"
 import categoryRoutes from "./routes/category.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import productImageRoutes from "./routes/product-image.routes.js";
+import orderRoutes from "./routes/order.routes.js";
+import userRoutes from "./routes/user.routes.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 
 const app = express();
@@ -19,9 +21,14 @@ app.use("/api/products", productImageRoutes);
 
 app.use("/api/products", productRoutes);
 
+app.use("/api/orders", orderRoutes);
+
+app.use("/api/users", userRoutes);
 
 
 //middleware de manejo de errores
+
+
 
 app.use(errorMiddleware);
 
