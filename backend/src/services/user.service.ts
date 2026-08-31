@@ -46,9 +46,17 @@ export async function loginUser(data: LoginUserData) {
     },
   });
 
+
   if (!user) {
     throw new AppError("Credenciales incorrectas", 401);
   }
+
+  if (!user.active) {
+  throw new AppError(
+    "La cuenta está desactivada",
+    403
+  );
+}
 
   const passwordValid = await bcrypt.compare(
     data.password,
@@ -189,6 +197,121 @@ export async function changePassword(
     },
     data: {
       password: hashedPassword,
+    },
+  });
+}
+
+
+//Obtener todos los usuarios (solo para administradores)
+
+export async function getAllUsers() {
+  return prisma.user.findMany({
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      active: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}
+
+// Obtener usuario por ID (solo para administradores)
+
+export async function getUserById(userId: number) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      active: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+
+  if (!user) {
+    throw new AppError("Usuario no encontrado", 404);
+  }
+
+  return user;
+}
+
+// Actualizar el rol del usuario (solo para administradores)
+
+export async function updateUserRole(
+  userId: number,
+  role: "USER" | "ADMIN"
+) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!user) {
+    throw new AppError("Usuario no encontrado", 404);
+  }
+
+  return prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      role,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      active: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+}
+
+// Actualizar el estado del usuario (solo para administradores)
+
+export async function updateUserStatus(
+  userId: number,
+  active: boolean
+) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!user) {
+    throw new AppError("Usuario no encontrado", 404);
+  }
+
+  return prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      active,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      active: true,
+      createdAt: true,
+      updatedAt: true,
     },
   });
 }

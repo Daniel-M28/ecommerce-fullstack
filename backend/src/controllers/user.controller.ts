@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
-import { registerUserSchema } from "../schemas/user.schema.js";
-import { registerUser,  loginUser, getCurrentUser, updateCurrentUser, changePassword,} from "../services/user.service.js";
+import { registerUserSchema, updateUserRoleSchema } from "../schemas/user.schema.js";
+import { registerUser,  loginUser, getCurrentUser, updateCurrentUser, changePassword, getAllUsers, getUserById, updateUserRole} from "../services/user.service.js";
 import { loginUserSchema , updateUserSchema, changePasswordSchema} from "../schemas/user.schema.js";
 import { AppError } from "../errors/app-error.js";
 
@@ -33,6 +33,7 @@ export async function loginUserController(
   next: NextFunction
 ) {
   try {
+    console.log("BODY LOGIN:", req.body);
     const data = loginUserSchema.parse(req.body);
 
     const result = await loginUser(data);
@@ -55,6 +56,8 @@ export async function getCurrentUserController(
     if (!req.user) {
       throw new AppError("Usuario no autenticado", 401);
     }
+
+
 
     const user = await getCurrentUser(req.user.id);
 
@@ -116,6 +119,75 @@ export async function changePasswordController(
 
     return res.status(200).json({
       message: "Contraseña actualizada correctamente",
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Obtener todos los usuarios (solo para administradores)
+
+export async function getAllUsersController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const users = await getAllUsers();
+
+    return res.status(200).json({
+      users,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Obtener un usuario por su id (solo para administradores)
+
+export async function getUserByIdController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = Number(req.params.userId);
+
+    if (Number.isNaN(userId)) {
+      throw new AppError("ID de usuario inválido", 400);
+    }
+
+    const user = await getUserById(userId);
+
+    return res.status(200).json({
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Actualizar el rol de un usuario (solo para administradores)
+
+export async function updateUserRoleController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = Number(req.params.userId);
+
+    if (Number.isNaN(userId)) {
+      throw new AppError("ID de usuario inválido", 400);
+    }
+
+    const data = updateUserRoleSchema.parse(req.body);
+
+    const user = await updateUserRole(userId, data.role);
+
+    return res.status(200).json({
+      message: "Rol actualizado correctamente",
+      user,
     });
   } catch (error) {
     next(error);

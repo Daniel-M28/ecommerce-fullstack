@@ -44,6 +44,18 @@ export const changePasswordSchema = z.object({
   newPassword: z.string().min(8),
 });
 
+//esquema para actualizar el rol del usuario (solo para administradores)
+
+export const updateUserRoleSchema = z.object({
+  role: z.enum(["USER", "ADMIN"]),
+});
+
+//esquema para actualizar el estado del usuario (solo para administradores)
+
+export const updateUserStatusSchema = z.object({
+  active: z.boolean(),
+});
+
 export type RegisterUserData = z.infer<typeof registerUserSchema>;
 export type LoginUserData = z.infer<typeof loginUserSchema>;
 export type UpdateUserData = z.infer<typeof updateUserSchema>;
