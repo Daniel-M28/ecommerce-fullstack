@@ -6,6 +6,7 @@ import productImageRoutes from "./routes/product-image.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
+import checkoutRoutes from "./routes/checkout.routes.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 
 const app = express();
@@ -34,7 +35,8 @@ app.use("/api/users", userRoutes);
 //carrito
 app.use("/api/cart", cartRoutes);
 
-
+//checkout
+app.use("/api/checkout", checkoutRoutes);
 
 //middleware de manejo de errores
 

@@ -7,6 +7,7 @@ import { updateUserStatusController } from "../controllers/product.controller.js
 const router = Router();
 
 router.post("/register", registerUserController);
+
 router.post("/login", loginUserController);
 
 router.get("/me",authMiddleware, getCurrentUserController);

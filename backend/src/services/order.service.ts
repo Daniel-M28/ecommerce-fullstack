@@ -256,7 +256,7 @@ export async function updateOrderStatus(
   }
 
   const allowedTransitions: Record<OrderStatus, OrderStatus[]> = {
-    PENDING: ["PAID", "CANCELLED"],
+    PENDING: ["PAID"],
     PAID: ["PROCESSING"],
     PROCESSING: ["SHIPPED"],
     SHIPPED: ["DELIVERED"],

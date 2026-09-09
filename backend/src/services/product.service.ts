@@ -58,21 +58,96 @@ export async function createProduct(data: CreateProductData) {
   return product;
 }
 
-//obtener todos los productos activos 
+//obtener todos los productos activos y filtros de busqueda
 
-export async function getProducts() {
-  return prisma.product.findMany({
-    where: {
-      active: true,               //active: true filtra los productos activos
+export async function getProducts(filters?: {
+  search?: string;
+  categoryId?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  sort?: "price_asc" | "price_desc" | "newest" | "oldest";
+  page?: number;
+  limit?: number;
+}) {
+  const page = filters?.page ?? 1;
+  const limit = filters?.limit ?? 10;
+
+  const skip = (page - 1) * limit;
+
+  const where = {
+    active: true,
+
+    ...(filters?.search && {
+      name: {
+        contains: filters.search,
+        mode: "insensitive" as const,
+      },
+    }),
+
+    ...(filters?.categoryId && {
+      categories: {
+        some: {
+          id: filters.categoryId,
+          active: true,
+        },
+      },
+    }),
+
+    ...(filters?.minPrice !== undefined && {
+      price: {
+        gte: filters.minPrice,
+      },
+    }),
+
+    ...(filters?.maxPrice !== undefined && {
+      price: {
+        lte: filters.maxPrice,
+      },
+    }),
+
+    ...(filters?.inStock !== undefined && {
+  stock: filters.inStock
+    ? { gt: 0 }
+    : { equals: 0 },
+}),
+}
+
+  const orderBy =
+    filters?.sort === "price_asc"
+      ? { price: "asc" as const }
+      : filters?.sort === "price_desc"
+        ? { price: "desc" as const }
+        : filters?.sort === "oldest"
+          ? { createdAt: "asc" as const }
+          : { createdAt: "desc" as const };
+
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: {
+        categories: true,
+        images: true,
+      },
+      orderBy,
+      skip,
+      take: limit,
+    }),
+
+    prisma.product.count({
+      where,
+    }),
+  ]);
+
+  return {
+    products,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
     },
-    include: {                    //include permite incluir relaciones en la consulta
-      categories: true,    
-      images: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  };
 }
 
 //Obtener un producto por su id

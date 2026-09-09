@@ -3,6 +3,7 @@ import { createProductSchema, updateProductSchema } from "../schemas/product.sch
 import { createProduct, getProductById, getProducts, updateProduct, deleteProduct,} from "../services/product.service.js";
 import { updateUserStatus } from "../services/user.service.js";
 import { updateUserStatusSchema } from "../schemas/user.schema.js";
+import { productFilterSchema } from "../schemas/product-filter.schema.js";
 import { AppError } from "../errors/app-error.js";
 
 
@@ -27,7 +28,7 @@ export async function createProductController(
   }
 }
 
-//obtener todos los productos activos
+//obtener todos los productos activos y filtros de busqueda
 
 export async function getProductsController(
   req: Request,
@@ -35,15 +36,16 @@ export async function getProductsController(
   next: NextFunction
 ) {
   try {
-    const products = await getProducts();
+    const filters = productFilterSchema.parse(req.query);
 
-    return res.status(200).json({
-      products,
-    });
+    const result = await getProducts(filters);
+
+    return res.status(200).json(result);
   } catch (error) {
     next(error);
   }
 }
+
 
 //Obtener un producto por su id
 

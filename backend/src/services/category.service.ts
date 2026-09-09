@@ -34,6 +34,7 @@ const createCategory = async (data: CreateCategoryData) => {
   });
 }
 
+
 //Funcion para obtener todas las categorias activas ordenadas por nombre
 const getCategories = async () => {
   return prisma.category.findMany({
