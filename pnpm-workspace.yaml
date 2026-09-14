@@ -3,5 +3,6 @@ packages:
   - frontend
 allowBuilds:
   '@prisma/engines': false
+  bcrypt: false
   esbuild: true
   prisma: false

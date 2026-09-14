@@ -7,12 +7,20 @@ import orderRoutes from "./routes/order.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
 import checkoutRoutes from "./routes/checkout.routes.js";
+import cors from "cors";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 
 const app = express();
 
 //Midleware para interpretar JSON
 app.use(express.json());
+
+//para permitir solicitudes desde el frontend
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 
 //registrar rutas
 app.use("/api", healthRouter);
