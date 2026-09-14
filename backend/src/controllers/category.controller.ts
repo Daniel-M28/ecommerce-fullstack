@@ -6,7 +6,9 @@ import { createCategory,
          getCategories, 
          getCategoryById,
          updateCategory, 
-         deleteCategory} from "../services/category.service.js";
+         deleteCategory,
+         activateCategory,
+         getAllCategories} from "../services/category.service.js";
  
 
 //Crear una nueva categoria
@@ -48,6 +50,24 @@ export async function getCategoriesController(
     next(error);
   }
 
+}
+
+// Obtener todas las categorias (admin)
+
+export async function getAllCategoriesController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const categories = await getAllCategories();
+
+    return res.status(200).json({
+      categories,
+    });
+  } catch (error) {
+    next(error);
+  }
 }
 
 
@@ -108,6 +128,7 @@ export async function updateCategoryController(
   }
 }
 
+
 //Desactivar una categoria existente
 
 export async function deleteCategoryController(
@@ -133,3 +154,35 @@ export async function deleteCategoryController(
   next(error);
 } 
 }
+
+//activar categoria
+
+export async function activateCategoryController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const id = Number(req.params.id);
+
+    if (Number.isNaN(id)) {
+      throw new AppError(
+        "El ID de la categoría debe ser un número",
+        400
+      );
+    }
+
+    const category = await activateCategory(id);
+
+    return res.status(200).json({
+      message: "Categoría activada correctamente",
+      category,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+
+
+

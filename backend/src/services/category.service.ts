@@ -47,6 +47,14 @@ const getCategories = async () => {
   });
 }
 
+//Funcion para obtener todas las categorias (admin)
+const getAllCategories = async () => {
+  return prisma.category.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
+};
 
 
 const getCategoryById = async (id: number) => {
@@ -135,6 +143,30 @@ const deleteCategory = async (id: number) => {
   });
 }
 
+//activar categoria
 
-export { createCategory, getCategories, getCategoryById, updateCategory, deleteCategory }; 
+const activateCategory = async (id: number) => {
+  const category = await prisma.category.findUnique({
+    where: { id },
+  });
+
+  if (!category) {
+    throw new AppError("Categoría no encontrada", 404);
+  }
+
+  if (category.active) {
+    throw new AppError("La categoría ya está activa", 400);
+  }
+
+  return prisma.category.update({
+    where: { id },
+    data: {
+      active: true,
+    },
+  });
+}
+
+
+
+export { createCategory, getCategories, getAllCategories, getCategoryById, updateCategory, deleteCategory, activateCategory }; 
 
