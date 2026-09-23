@@ -16,6 +16,7 @@ import OrdersPage from "./pages/OrdersPage";
 
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminCategoriesPage from "./pages/admin/AdminCategoriesPage";
+import AdminProductsPage from "./pages/admin/AdminProductsPage";
 import AdminLayout from "./layouts/AdminLayout";
 
 
@@ -44,7 +45,8 @@ function App() {
           <Route element={<AdminRoute />}>
             <Route element={<AdminLayout />}>
              <Route path="/admin"element={<AdminDashboardPage />}/>
-              <Route path="/admin/categories" element={<AdminCategoriesPage />} />
+             <Route path="/admin/products"element={<AdminProductsPage />}/>
+             <Route path="/admin/categories" element={<AdminCategoriesPage />} />
             </Route>
           </Route>
         </Route>

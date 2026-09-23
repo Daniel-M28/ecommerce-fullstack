@@ -1,12 +1,13 @@
 import { prisma } from "../config/prisma.js";
 import { AppError } from "../errors/app-error.js";
 import type { z } from "zod";
-import { createProductSchema,updateProductSchema, } from "../schemas/product.schema.js";
+import {
+  createProductSchema,
+  updateProductSchema,
+} from "../schemas/product.schema.js";
 
-type CreateProductData = z.infer<typeof createProductSchema>; //infiere el tipo de datos que se espera en la función createProduct a partir del esquema de validación de Zod
-type UpdateProductData = z.infer<typeof updateProductSchema>; //infiere el tipo de datos que se espera en la función updateProduct a partir del esquema de validación de Zod
-
-//Funcion para crear un nuevo producto
+type CreateProductData = z.infer<typeof createProductSchema>;
+type UpdateProductData = z.infer<typeof updateProductSchema>;
 
 export async function createProduct(data: CreateProductData) {
   const existingProduct = await prisma.product.findFirst({
@@ -58,8 +59,6 @@ export async function createProduct(data: CreateProductData) {
   return product;
 }
 
-//obtener todos los productos activos y filtros de busqueda
-
 export async function getProducts(filters?: {
   search?: string;
   categoryId?: number;
@@ -107,11 +106,11 @@ export async function getProducts(filters?: {
     }),
 
     ...(filters?.inStock !== undefined && {
-  stock: filters.inStock
-    ? { gt: 0 }
-    : { equals: 0 },
-}),
-}
+      stock: filters.inStock
+        ? { gt: 0 }
+        : { equals: 0 },
+    }),
+  };
 
   const orderBy =
     filters?.sort === "price_asc"
@@ -150,7 +149,92 @@ export async function getProducts(filters?: {
   };
 }
 
-//Obtener un producto por su id
+export async function getAllProducts(filters?: {
+  search?: string;
+  categoryId?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  sort?: "price_asc" | "price_desc" | "newest" | "oldest";
+  page?: number;
+  limit?: number;
+}) {
+  const page = filters?.page ?? 1;
+  const limit = filters?.limit ?? 10;
+
+  const skip = (page - 1) * limit;
+
+  const where = {
+    ...(filters?.search && {
+      name: {
+        contains: filters.search,
+        mode: "insensitive" as const,
+      },
+    }),
+
+    ...(filters?.categoryId && {
+      categories: {
+        some: {
+          id: filters.categoryId,
+        },
+      },
+    }),
+
+    ...(filters?.minPrice !== undefined && {
+      price: {
+        gte: filters.minPrice,
+      },
+    }),
+
+    ...(filters?.maxPrice !== undefined && {
+      price: {
+        lte: filters.maxPrice,
+      },
+    }),
+
+    ...(filters?.inStock !== undefined && {
+      stock: filters.inStock
+        ? { gt: 0 }
+        : { equals: 0 },
+    }),
+  };
+
+  const orderBy =
+    filters?.sort === "price_asc"
+      ? { price: "asc" as const }
+      : filters?.sort === "price_desc"
+        ? { price: "desc" as const }
+        : filters?.sort === "oldest"
+          ? { createdAt: "asc" as const }
+          : { createdAt: "desc" as const };
+
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: {
+        categories: true,
+        images: true,
+      },
+      orderBy,
+      skip,
+      take: limit,
+    }),
+
+    prisma.product.count({
+      where,
+    }),
+  ]);
+
+  return {
+    products,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+}
 
 export async function getProductById(id: number) {
   const product = await prisma.product.findFirst({
@@ -170,8 +254,6 @@ export async function getProductById(id: number) {
 
   return product;
 }
-
-//actualizar un producto por su id
 
 export async function updateProduct(
   id: number,
@@ -250,8 +332,6 @@ export async function updateProduct(
   return productUpdated;
 }
 
-//desactivar un producto
-
 export async function deleteProduct(id: number) {
   const product = await prisma.product.findFirst({
     where: {
@@ -272,4 +352,32 @@ export async function deleteProduct(id: number) {
       active: false,
     },
   });
+}
+
+export async function activateProduct(id: number) {
+  const product = await prisma.product.findFirst({
+    where: {
+      id,
+      active: false,
+    },
+  });
+
+  if (!product) {
+    throw new AppError("Producto no encontrado o ya está activo", 404);
+  }
+
+  const productActivated = await prisma.product.update({
+    where: {
+      id,
+    },
+    data: {
+      active: true,
+    },
+    include: {
+      categories: true,
+      images: true,
+    },
+  });
+
+  return productActivated;
 }
