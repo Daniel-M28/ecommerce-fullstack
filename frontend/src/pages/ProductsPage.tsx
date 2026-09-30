@@ -14,27 +14,30 @@ function ProductsPage() {
 
   const [data, setData] = useState<ProductsResponse | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
+
   const [search, setSearch] = useState(
     searchParams.get("search") ?? ""
   );
+
   const [categoryId, setCategoryId] = useState(
     searchParams.get("categoryId") ?? ""
   );
+
   const [sort, setSort] = useState(
     searchParams.get("sort") ?? "newest"
   );
 
-const [minPrice, setMinPrice] = useState(
-  searchParams.get("minPrice") ?? ""
-);
+  const [minPrice, setMinPrice] = useState(
+    searchParams.get("minPrice") ?? ""
+  );
 
-const [maxPrice, setMaxPrice] = useState(
-  searchParams.get("maxPrice") ?? ""
-);
+  const [maxPrice, setMaxPrice] = useState(
+    searchParams.get("maxPrice") ?? ""
+  );
 
-const [inStock, setInStock] = useState(
-  searchParams.get("inStock") === "true"
-);
+  const [inStock, setInStock] = useState(
+    searchParams.get("inStock") === "true"
+  );
 
   const [error, setError] = useState("");
 
@@ -62,20 +65,41 @@ const [inStock, setInStock] = useState(
       try {
         const params = new URLSearchParams();
 
-        if (search.trim()) {
-          params.set("search", search.trim());
+        const currentSearch = searchParams.get("search") ?? "";
+        const currentCategoryId = searchParams.get("categoryId") ?? "";
+        const currentSort = searchParams.get("sort") ?? "newest";
+        const currentMinPrice = searchParams.get("minPrice") ?? "";
+        const currentMaxPrice = searchParams.get("maxPrice") ?? "";
+        const currentInStock = searchParams.get("inStock");
+        const currentPage = searchParams.get("page") ?? "1";
+        const currentLimit = searchParams.get("limit") ?? "12";
+
+        if (currentSearch.trim()) {
+          params.set("search", currentSearch.trim());
         }
 
-        if (categoryId) {
-          params.set("categoryId", categoryId);
+        if (currentCategoryId) {
+          params.set("categoryId", currentCategoryId);
         }
 
-        if (sort) {
-          params.set("sort", sort);
+        if (currentSort) {
+          params.set("sort", currentSort);
         }
 
-        params.set("page", "1");
-        params.set("limit", "12");
+        if (currentMinPrice) {
+          params.set("minPrice", currentMinPrice);
+        }
+
+        if (currentMaxPrice) {
+          params.set("maxPrice", currentMaxPrice);
+        }
+
+        if (currentInStock === "true") {
+          params.set("inStock", "true");
+        }
+
+        params.set("page", currentPage);
+        params.set("limit", currentLimit);
 
         const productsData = await apiFetch<ProductsResponse>(
           `/products?${params.toString()}`
@@ -95,20 +119,20 @@ const [inStock, setInStock] = useState(
   }, [searchParams]);
 
   function handleSearch(event: React.FormEvent<HTMLFormElement>) {
-  event.preventDefault();
+    event.preventDefault();
 
-  const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);
 
-  if (search.trim()) {
-    params.set("search", search.trim());
-  } else {
-    params.delete("search");
+    if (search.trim()) {
+      params.set("search", search.trim());
+    } else {
+      params.delete("search");
+    }
+
+    params.set("page", "1");
+
+    setSearchParams(params);
   }
-
-  params.set("page", "1");
-
-  setSearchParams(params);
-}
 
   function handleCategoryChange(value: string) {
     setCategoryId(value);
@@ -143,27 +167,27 @@ const [inStock, setInStock] = useState(
   }
 
   function handlePageChange(page: number) {
-  const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);
 
-  params.set("page", page.toString());
+    params.set("page", page.toString());
 
-  setSearchParams(params);
-}
+    setSearchParams(params);
+  }
 
   function clearFilters() {
-  setSearch("");
-  setCategoryId("");
-  setSort("newest");
-  setMinPrice("");
-  setMaxPrice("");
-  setInStock(false);
+    setSearch("");
+    setCategoryId("");
+    setSort("newest");
+    setMinPrice("");
+    setMaxPrice("");
+    setInStock(false);
 
-  setSearchParams({
-    sort: "newest",
-    page: "1",
-    limit: "12",
-  });
-}
+    setSearchParams({
+      sort: "newest",
+      page: "1",
+      limit: "12",
+    });
+  }
 
   if (error) {
     return (
@@ -203,176 +227,182 @@ const [inStock, setInStock] = useState(
       {/* Filters */}
       <section className="rounded-xl border border-blue-100 bg-white p-5 shadow-sm">
         <div className="space-y-4">
-  {/* Búsqueda */}
-  <form onSubmit={handleSearch}>
-    <label
-      htmlFor="search"
-      className="mb-1.5 block text-sm font-medium text-slate-700"
-    >
-      Buscar
-    </label>
+          {/* Búsqueda */}
+          <form onSubmit={handleSearch}>
+            <label
+              htmlFor="search"
+              className="mb-1.5 block text-sm font-medium text-slate-700"
+            >
+              Buscar
+            </label>
 
-    <div className="flex gap-2">
-      <input
-        id="search"
-        type="text"
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        placeholder="Buscar productos..."
-        className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-      />
+            <div className="flex gap-2">
+              <input
+                id="search"
+                type="text"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Buscar productos..."
+                className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              />
 
-      <button
-        type="submit"
-        className="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700"
-      >
-        Buscar
-      </button>
-    </div>
-  </form>
+              <button
+                type="submit"
+                className="rounded-lg bg-blue-600 px-5 py-2.5 font-medium text-white transition hover:bg-blue-700"
+              >
+                Buscar
+              </button>
+            </div>
+          </form>
 
-  {/* Filtros */}
-  <div className="grid gap-3 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-[1.2fr_1.2fr_1fr_1fr_auto]">
-    {/* Categoría */}
-    <div>
-      <label
-        htmlFor="category"
-        className="mb-1.5 block text-sm font-medium text-slate-700"
-      >
-        Categoría
-      </label>
+          {/* Filtros */}
+          <div className="grid gap-3 border-t border-slate-100 pt-4 sm:grid-cols-2 lg:grid-cols-[1.2fr_1.2fr_1fr_1fr_auto]">
+            {/* Categoría */}
+            <div>
+              <label
+                htmlFor="category"
+                className="mb-1.5 block text-sm font-medium text-slate-700"
+              >
+                Categoría
+              </label>
 
-      <select
-        id="category"
-        value={categoryId}
-        onChange={(event) =>
-          handleCategoryChange(event.target.value)
-        }
-        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-      >
-        <option value="">Todas las categorías</option>
+              <select
+                id="category"
+                value={categoryId}
+                onChange={(event) =>
+                  handleCategoryChange(event.target.value)
+                }
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              >
+                <option value="">Todas las categorías</option>
 
-        {categories.map((category) => (
-          <option key={category.id} value={category.id}>
-            {category.name}
-          </option>
-        ))}
-      </select>
-    </div>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-    {/* Ordenar */}
-    <div>
-      <label
-        htmlFor="sort"
-        className="mb-1.5 block text-sm font-medium text-slate-700"
-      >
-        Ordenar por
-      </label>
+            {/* Ordenar */}
+            <div>
+              <label
+                htmlFor="sort"
+                className="mb-1.5 block text-sm font-medium text-slate-700"
+              >
+                Ordenar por
+              </label>
 
-      <select
-        id="sort"
-        value={sort}
-        onChange={(event) =>
-          handleSortChange(event.target.value)
-        }
-        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-      >
-        <option value="newest">Más recientes</option>
-        <option value="oldest">Más antiguos</option>
-        <option value="price_asc">Precio: menor a mayor</option>
-        <option value="price_desc">Precio: mayor a menor</option>
-      </select>
-    </div>
+              <select
+                id="sort"
+                value={sort}
+                onChange={(event) =>
+                  handleSortChange(event.target.value)
+                }
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              >
+                <option value="newest">Más recientes</option>
+                <option value="oldest">Más antiguos</option>
+                <option value="price_asc">
+                  Precio: menor a mayor
+                </option>
+                <option value="price_desc">
+                  Precio: mayor a menor
+                </option>
+              </select>
+            </div>
 
-    {/* Precio mínimo */}
-    <div>
-      <label
-        htmlFor="minPrice"
-        className="mb-1.5 block text-sm font-medium text-slate-700"
-      >
-        Precio mínimo
-      </label>
+            {/* Precio mínimo */}
+            <div>
+              <label
+                htmlFor="minPrice"
+                className="mb-1.5 block text-sm font-medium text-slate-700"
+              >
+                Precio mínimo
+              </label>
 
-      <input
-        id="minPrice"
-        type="number"
-        min="0"
-        value={minPrice}
-        onChange={(event) => setMinPrice(event.target.value)}
-        placeholder="Ej. 50000"
-        className="w-full rounded-lg border border-slate-300 px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-      />
-    </div>
+              <input
+                id="minPrice"
+                type="number"
+                min="0"
+                value={minPrice}
+                onChange={(event) => setMinPrice(event.target.value)}
+                placeholder="Ej. 50000"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              />
+            </div>
 
-    {/* Precio máximo */}
-    <div>
-      <label
-        htmlFor="maxPrice"
-        className="mb-1.5 block text-sm font-medium text-slate-700"
-      >
-        Precio máximo
-      </label>
+            {/* Precio máximo */}
+            <div>
+              <label
+                htmlFor="maxPrice"
+                className="mb-1.5 block text-sm font-medium text-slate-700"
+              >
+                Precio máximo
+              </label>
 
-      <input
-        id="maxPrice"
-        type="number"
-        min="0"
-        value={maxPrice}
-        onChange={(event) => setMaxPrice(event.target.value)}
-        placeholder="Ej. 500000"
-        className="w-full rounded-lg border border-slate-300 px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-      />
-    </div>
+              <input
+                id="maxPrice"
+                type="number"
+                min="0"
+                value={maxPrice}
+                onChange={(event) => setMaxPrice(event.target.value)}
+                placeholder="Ej. 500000"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2.5 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              />
+            </div>
 
-    {/* Stock + botón */}
-    <div className="flex items-end gap-3">
-      <label className="flex cursor-pointer items-center gap-2 pb-2.5">
-        <input
-          type="checkbox"
-          checked={inStock}
-          onChange={(event) => setInStock(event.target.checked)}
-          className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-        />
+            {/* Stock + botón */}
+            <div className="flex items-end gap-3">
+              <label className="flex cursor-pointer items-center gap-2 pb-2.5">
+                <input
+                  type="checkbox"
+                  checked={inStock}
+                  onChange={(event) =>
+                    setInStock(event.target.checked)
+                  }
+                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                />
 
-        <span className="whitespace-nowrap text-sm font-medium text-slate-700">
-          Solo disponibles
-        </span>
-      </label>
+                <span className="whitespace-nowrap text-sm font-medium text-slate-700">
+                  Solo disponibles
+                </span>
+              </label>
 
-      <button
-        type="button"
-        onClick={() => {
-          const params = new URLSearchParams(searchParams);
+              <button
+                type="button"
+                onClick={() => {
+                  const params = new URLSearchParams(searchParams);
 
-          if (minPrice) {
-            params.set("minPrice", minPrice);
-          } else {
-            params.delete("minPrice");
-          }
+                  if (minPrice) {
+                    params.set("minPrice", minPrice);
+                  } else {
+                    params.delete("minPrice");
+                  }
 
-          if (maxPrice) {
-            params.set("maxPrice", maxPrice);
-          } else {
-            params.delete("maxPrice");
-          }
+                  if (maxPrice) {
+                    params.set("maxPrice", maxPrice);
+                  } else {
+                    params.delete("maxPrice");
+                  }
 
-          if (inStock) {
-            params.set("inStock", "true");
-          } else {
-            params.delete("inStock");
-          }
+                  if (inStock) {
+                    params.set("inStock", "true");
+                  } else {
+                    params.delete("inStock");
+                  }
 
-          params.set("page", "1");
+                  params.set("page", "1");
 
-          setSearchParams(params);
-        }}
-        className="whitespace-nowrap rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white transition hover:bg-blue-700"
-      >
-        Aplicar filtros
-      </button>
-    </div>
-  </div>
-</div>
+                  setSearchParams(params);
+                }}
+                className="whitespace-nowrap rounded-lg bg-blue-600 px-4 py-2.5 font-medium text-white transition hover:bg-blue-700"
+              >
+                Aplicar filtros
+              </button>
+            </div>
+          </div>
+        </div>
 
         {/* Clear */}
         <div className="mt-4 flex justify-end border-t border-slate-100 pt-4">
@@ -421,61 +451,60 @@ const [inStock, setInStock] = useState(
               ))}
             </div>
           )}
-          
+
           {/* Pagination */}
-         {data.pagination.totalPages > 1 && (
-  <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
-    {/* Página anterior */}
-    <button
-      type="button"
-      disabled={data.pagination.page === 1}
-      onClick={() =>
-        handlePageChange(data.pagination.page - 1)
-      }
-      className="rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40"
-    >
-      Anterior
-    </button>
+          {data.pagination.totalPages > 1 && (
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-4">
+              {/* Página anterior */}
+              <button
+                type="button"
+                disabled={data.pagination.page === 1}
+                onClick={() =>
+                  handlePageChange(data.pagination.page - 1)
+                }
+                className="rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Anterior
+              </button>
 
-    {/* Números de página */}
-    {Array.from(
-      { length: data.pagination.totalPages },
-      (_, index) => index + 1
-    ).map((page) => (
-      <button
-        key={page}
-        type="button"
-        onClick={() => handlePageChange(page)}
-        className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-          page === data.pagination.page
-            ? "bg-blue-600 text-white"
-            : "border border-blue-200 bg-white text-blue-700 hover:bg-blue-50"
-        }`}
-      >
-        {page}
-      </button>
-    ))}
+              {/* Números de página */}
+              {Array.from(
+                { length: data.pagination.totalPages },
+                (_, index) => index + 1
+              ).map((page) => (
+                <button
+                  key={page}
+                  type="button"
+                  onClick={() => handlePageChange(page)}
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                    page === data.pagination.page
+                      ? "bg-blue-600 text-white"
+                      : "border border-blue-200 bg-white text-blue-700 hover:bg-blue-50"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
 
-    {/* Página siguiente */}
-    <button
-      type="button"
-      disabled={
-        data.pagination.page === data.pagination.totalPages
-      }
-      onClick={() =>
-        handlePageChange(data.pagination.page + 1)
-      }
-      className="rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40"
-    >
-      Siguiente
-    </button>
-  </div>
-
-  )};
- 
-    </>
-  )}
-  </div>
+              {/* Página siguiente */}
+              <button
+                type="button"
+                disabled={
+                  data.pagination.page ===
+                  data.pagination.totalPages
+                }
+                onClick={() =>
+                  handlePageChange(data.pagination.page + 1)
+                }
+                className="rounded-lg border border-blue-200 bg-white px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Siguiente
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 }
 

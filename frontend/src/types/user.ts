@@ -9,3 +9,12 @@ export interface User {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface UsersResponse {
+  users: User[];
+}
+
+export interface UserResponse {
+  message?: string;
+  user: User;
+}

@@ -42,12 +42,20 @@ function MainLayout() {
             >
               Productos
             </Link>
+            
+            <Link
+              to="/orders"
+              className="font-medium text-slate-600 transition hover:text-blue-600"
+            >
+              Mis pedidos
+            </Link>
+
 
             <Link
               to="/cart"
               className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white transition hover:bg-blue-700"
             >
-              🛒 Carrito
+               🛒 Carrito
               {totalItems > 0 && (
                 <span className="ml-2 rounded-full bg-white px-2 py-0.5 text-xs font-bold text-blue-600">
                   {totalItems}
@@ -105,9 +113,18 @@ function MainLayout() {
                         onClick={() => setIsUserMenuOpen(false)}
                         className="block px-4 py-3 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
                       >
-                        ⚙️ Administración
+                         Administración
                       </Link>
                     )}
+
+                      <Link
+                        to="/profile"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="block px-4 py-3 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
+                      >
+                         Perfil
+                      </Link>
+
 
                     <button
                       type="button"

@@ -182,29 +182,5 @@ export async function activateProductController(
   }
 }
 
-// Actualizar el estado de un usuario (activo/inactivo)
 
-export async function updateUserStatusController(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    const userId = Number(req.params.userId);
 
-    if (Number.isNaN(userId)) {
-      throw new AppError("ID de usuario inválido", 400);
-    }
-
-    const data = updateUserStatusSchema.parse(req.body);
-
-    const user = await updateUserStatus(userId, data.active);
-
-    return res.status(200).json({
-      message: "Estado del usuario actualizado correctamente",
-      user,
-    });
-  } catch (error) {
-    next(error);
-  }
-}

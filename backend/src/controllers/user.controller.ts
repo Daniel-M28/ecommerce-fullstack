@@ -1,11 +1,30 @@
 import type { NextFunction, Request, Response } from "express";
-import { registerUserSchema, updateUserRoleSchema } from "../schemas/user.schema.js";
-import { registerUser,  loginUser, getCurrentUser, updateCurrentUser, changePassword, getAllUsers, getUserById, updateUserRole} from "../services/user.service.js";
-import { loginUserSchema , updateUserSchema, changePasswordSchema} from "../schemas/user.schema.js";
+
+import {
+  registerUserSchema,
+  loginUserSchema,
+  updateUserSchema,
+  changePasswordSchema,
+  updateUserRoleSchema,
+  updateUserStatusSchema,
+} from "../schemas/user.schema.js";
+
+import {
+  registerUser,
+  loginUser,
+  getCurrentUser,
+  updateCurrentUser,
+  changePassword,
+  getAllUsers,
+  getUserById,
+  updateUserRole,
+  updateUserStatus,
+} from "../services/user.service.js";
+
 import { AppError } from "../errors/app-error.js";
 
+// Registro de usuario
 
-//Registro de usuario
 export async function registerUserController(
   req: Request,
   res: Response,
@@ -25,7 +44,7 @@ export async function registerUserController(
   }
 }
 
-//login de usuario
+// Login de usuario
 
 export async function loginUserController(
   req: Request,
@@ -34,6 +53,7 @@ export async function loginUserController(
 ) {
   try {
     console.log("BODY LOGIN:", req.body);
+
     const data = loginUserSchema.parse(req.body);
 
     const result = await loginUser(data);
@@ -47,6 +67,8 @@ export async function loginUserController(
   }
 }
 
+// Obtener información del usuario actual
+
 export async function getCurrentUserController(
   req: Request,
   res: Response,
@@ -56,8 +78,6 @@ export async function getCurrentUserController(
     if (!req.user) {
       throw new AppError("Usuario no autenticado", 401);
     }
-
-
 
     const user = await getCurrentUser(req.user.id);
 
@@ -69,7 +89,7 @@ export async function getCurrentUserController(
   }
 }
 
-//Actualizar información del usuario
+// Actualizar información del usuario
 
 export async function updateCurrentUserController(
   req: Request,
@@ -83,10 +103,7 @@ export async function updateCurrentUserController(
 
     const data = updateUserSchema.parse(req.body);
 
-    const user = await updateCurrentUser(
-      req.user.id,
-      data
-    );
+    const user = await updateCurrentUser(req.user.id, data);
 
     return res.status(200).json({
       message: "Usuario actualizado correctamente",
@@ -97,7 +114,7 @@ export async function updateCurrentUserController(
   }
 }
 
-//Cambiar contraseña del usuario
+// Cambiar contraseña del usuario
 
 export async function changePasswordController(
   req: Request,
@@ -125,7 +142,8 @@ export async function changePasswordController(
   }
 }
 
-// Obtener todos los usuarios (solo para administradores)
+// Obtener todos los usuarios
+// Solo para administradores
 
 export async function getAllUsersController(
   req: Request,
@@ -143,7 +161,8 @@ export async function getAllUsersController(
   }
 }
 
-// Obtener un usuario por su id (solo para administradores)
+// Obtener un usuario por su ID
+// Solo para administradores
 
 export async function getUserByIdController(
   req: Request,
@@ -167,7 +186,8 @@ export async function getUserByIdController(
   }
 }
 
-// Actualizar el rol de un usuario (solo para administradores)
+// Actualizar el rol de un usuario
+// Solo para administradores
 
 export async function updateUserRoleController(
   req: Request,
@@ -187,6 +207,34 @@ export async function updateUserRoleController(
 
     return res.status(200).json({
       message: "Rol actualizado correctamente",
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Actualizar el estado de un usuario
+// Solo para administradores
+
+export async function updateUserStatusController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const userId = Number(req.params.userId);
+
+    if (Number.isNaN(userId)) {
+      throw new AppError("ID de usuario inválido", 400);
+    }
+
+    const data = updateUserStatusSchema.parse(req.body);
+
+    const user = await updateUserStatus(userId, data.active);
+
+    return res.status(200).json({
+      message: "Estado del usuario actualizado correctamente",
       user,
     });
   } catch (error) {

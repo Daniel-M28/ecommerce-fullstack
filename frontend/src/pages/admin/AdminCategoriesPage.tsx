@@ -144,7 +144,7 @@ function AdminCategoriesPage() {
         await apiFetch<CategoryResponse>(
           `/categories/${editingCategoryId}`,
           {
-            method: "PUT",
+            method: "PATCH",
             token: localStorage.getItem("token") ?? undefined,
             body: JSON.stringify({
               name,

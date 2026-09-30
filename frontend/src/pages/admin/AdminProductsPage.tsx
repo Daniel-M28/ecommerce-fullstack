@@ -21,6 +21,10 @@ interface ProductResponse {
   product: Product;
 }
 
+interface ImagesResponse {
+  images: Product["images"];
+}
+
 interface ProductFormData {
   name: string;
   description: string;
@@ -42,9 +46,16 @@ function AdminProductsPage() {
   const [editingProductId, setEditingProductId] = useState<number | null>(
     null
   );
+
   const [changingStatusId, setChangingStatusId] = useState<number | null>(
     null
   );
+
+  const [addingImage, setAddingImage] = useState(false);
+  const [deletingImageId, setDeletingImageId] = useState<number | null>(
+    null
+  );
+  const [newImageUrl, setNewImageUrl] = useState("");
 
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
@@ -130,6 +141,7 @@ function AdminProductsPage() {
       categoryId: "",
     });
 
+    setNewImageUrl("");
     setError("");
     setIsFormOpen(true);
   }
@@ -148,17 +160,19 @@ function AdminProductsPage() {
         : "",
     });
 
+    setNewImageUrl("");
     setError("");
     setIsFormOpen(true);
   }
 
   function closeForm() {
-    if (isCreating) {
+    if (isCreating || addingImage || deletingImageId !== null) {
       return;
     }
 
     setIsFormOpen(false);
     setEditingProductId(null);
+    setNewImageUrl("");
     setError("");
   }
 
@@ -308,6 +322,76 @@ function AdminProductsPage() {
     }
   }
 
+  async function handleAddImage() {
+    if (editingProductId === null) {
+      return;
+    }
+
+    const url = newImageUrl.trim();
+
+    if (!url) {
+      setError("Debes ingresar la URL de la imagen.");
+      return;
+    }
+
+    setError("");
+    setAddingImage(true);
+
+    try {
+      await apiFetch<ProductResponse>(
+        `/products/${editingProductId}/images`,
+        {
+          method: "POST",
+          token: localStorage.getItem("token") ?? undefined,
+          body: JSON.stringify({
+            url,
+          }),
+        }
+      );
+
+      setNewImageUrl("");
+
+      await loadProducts();
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo agregar la imagen."
+      );
+    } finally {
+      setAddingImage(false);
+    }
+  }
+
+  async function handleDeleteImage(imageId: number) {
+    if (editingProductId === null) {
+      return;
+    }
+
+    setError("");
+    setDeletingImageId(imageId);
+
+    try {
+      await apiFetch(
+        `/products/${editingProductId}/images/${imageId}`,
+        {
+          method: "DELETE",
+          token: localStorage.getItem("token") ?? undefined,
+        }
+      );
+
+      await loadProducts();
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "No se pudo eliminar la imagen."
+      );
+    } finally {
+      setDeletingImageId(null);
+    }
+  }
+
   function formatPrice(price: string) {
     const numericPrice = Number(price);
 
@@ -319,6 +403,13 @@ function AdminProductsPage() {
       maximumFractionDigits: 0,
     }).format(numericPrice);
   }
+
+  const editingProduct =
+    editingProductId !== null
+      ? products.find(
+          (product) => product.id === editingProductId
+        )
+      : null;
 
   if (isLoading) {
     return (
@@ -350,7 +441,12 @@ function AdminProductsPage() {
         <button
           type="button"
           onClick={openCreateForm}
-          disabled={isCreating || changingStatusId !== null}
+          disabled={
+            isCreating ||
+            changingStatusId !== null ||
+            addingImage ||
+            deletingImageId !== null
+          }
           className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
         >
           + Nuevo producto
@@ -516,6 +612,101 @@ function AdminProductsPage() {
               </div>
             </div>
 
+            {editingProductId !== null && editingProduct && (
+              <section className="rounded-xl border border-blue-100 bg-slate-50 p-5">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900">
+                    Imágenes del producto
+                  </h3>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    Agrega imágenes utilizando su URL.
+                  </p>
+                </div>
+
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                  <input
+                    type="url"
+                    value={newImageUrl}
+                    onChange={(event) =>
+                      setNewImageUrl(event.target.value)
+                    }
+                    disabled={
+                      addingImage ||
+                      deletingImageId !== null
+                    }
+                    placeholder="https://ejemplo.com/imagen.jpg"
+                    className="flex-1 rounded-lg border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:bg-slate-100"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={handleAddImage}
+                    disabled={
+                      addingImage ||
+                      deletingImageId !== null ||
+                      !newImageUrl.trim()
+                    }
+                    className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+                  >
+                    {addingImage
+                      ? "Agregando..."
+                      : "Agregar imagen"}
+                  </button>
+                </div>
+
+                {editingProduct.images.length === 0 ? (
+                  <div className="mt-5 rounded-lg border border-dashed border-slate-300 bg-white p-6 text-center">
+                    <p className="text-sm text-slate-500">
+                      Este producto todavía no tiene imágenes.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {editingProduct.images.map((image) => (
+                      <div
+                        key={image.id}
+                        className="overflow-hidden rounded-xl border border-slate-200 bg-white"
+                      >
+                        <div className="aspect-video bg-slate-100">
+                          <img
+                            src={image.url}
+                            alt={editingProduct.name}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+
+                        <div className="p-4">
+                          <p
+                            className="truncate text-xs text-slate-500"
+                            title={image.url}
+                          >
+                            {image.url}
+                          </p>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleDeleteImage(image.id)
+                            }
+                            disabled={
+                              addingImage ||
+                              deletingImageId !== null
+                            }
+                            className="mt-3 w-full rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {deletingImageId === image.id
+                              ? "Eliminando..."
+                              : "Eliminar imagen"}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
+
             {error && (
               <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
                 {error}
@@ -526,7 +717,11 @@ function AdminProductsPage() {
               <button
                 type="button"
                 onClick={closeForm}
-                disabled={isCreating}
+                disabled={
+                  isCreating ||
+                  addingImage ||
+                  deletingImageId !== null
+                }
                 className="rounded-lg border border-slate-300 px-5 py-3 font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Cancelar
@@ -534,7 +729,11 @@ function AdminProductsPage() {
 
               <button
                 type="submit"
-                disabled={isCreating}
+                disabled={
+                  isCreating ||
+                  addingImage ||
+                  deletingImageId !== null
+                }
                 className="rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
               >
                 {isCreating
@@ -686,10 +885,14 @@ function AdminProductsPage() {
                         {product.active && (
                           <button
                             type="button"
-                            onClick={() => openEditForm(product)}
+                            onClick={() =>
+                              openEditForm(product)
+                            }
                             disabled={
                               isCreating ||
-                              changingStatusId !== null
+                              changingStatusId !== null ||
+                              addingImage ||
+                              deletingImageId !== null
                             }
                             className="rounded-lg border border-blue-200 px-3 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-50"
                           >
@@ -704,7 +907,9 @@ function AdminProductsPage() {
                           }
                           disabled={
                             isCreating ||
-                            changingStatusId !== null
+                            changingStatusId !== null ||
+                            addingImage ||
+                            deletingImageId !== null
                           }
                           className={`rounded-lg px-3 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
                             product.active

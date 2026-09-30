@@ -8,6 +8,12 @@ export type OrderStatus =
   | "DELIVERED"
   | "CANCELLED";
 
+export interface OrderUser {
+  id: number;
+  name: string;
+  email: string;
+}
+
 export interface OrderItem {
   id: number;
   orderId: number;
@@ -32,4 +38,14 @@ export interface Order {
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
+  user?: OrderUser;
+}
+
+export interface OrdersResponse {
+  orders: Order[];
+}
+
+export interface OrderResponse {
+  message?: string;
+  order: Order;
 }

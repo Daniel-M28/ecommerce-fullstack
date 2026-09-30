@@ -60,29 +60,39 @@ function HomePage() {
   return (
     <div className="space-y-16">
       {/* Hero */}
-      <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-800 via-blue-700 to-blue-500 px-8 py-16 text-white shadow-lg md:px-12">
-        <div className="max-w-2xl">
-          <p className="mb-3 font-medium text-blue-100">
-            Todo lo que necesitas
-          </p>
+     <section className="overflow-hidden rounded-2xl bg-gradient-to-br from-blue-800 via-blue-700 to-blue-500 px-8 py-16 text-white shadow-lg md:px-12">
+  <div className="flex flex-col items-center justify-between gap-10 md:flex-row">
+    <div className="max-w-2xl">
+      <p className="mb-3 font-medium text-blue-100">
+        Todo lo que necesitas
+      </p>
 
-          <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
-            Encuentra tus productos favoritos
-          </h1>
+      <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
+        Encuentra tus productos favoritos
+      </h1>
 
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-blue-100">
-            Descubre nuestra selección de productos y encuentra lo que estás
-            buscando de forma rápida y sencilla.
-          </p>
+      <p className="mt-5 max-w-xl text-lg leading-relaxed text-blue-100">
+        Descubre nuestra selección de productos y encuentra lo que estás
+        buscando de forma rápida y sencilla.
+      </p>
 
-          <Link
-            to="/products"
-            className="mt-8 inline-block rounded-lg bg-white px-6 py-3 font-semibold text-blue-700 shadow-sm transition hover:bg-blue-50"
-          >
-            Ver productos
-          </Link>
-        </div>
-      </section>
+      <Link
+        to="/products"
+        className="mt-8 inline-block rounded-lg bg-white px-6 py-3 font-semibold text-blue-700 shadow-sm transition hover:bg-blue-50"
+      >
+        Ver productos
+      </Link>
+    </div>
+
+    <div className="hidden shrink-0 md:block md:w-[40%]">
+      <img
+        src="https://png.pngtree.com/png-vector/20250607/ourmid/pngtree-realistic-3d-shopping-cart-with-product-boxes-for-e-commerce-and-png-image_16486581.png"
+        alt="Carrito de compras con diferentes productos"
+        className="h-auto w-full object-contain drop-shadow-2xl"
+      />
+    </div>
+  </div>
+</section>
 
       {/* Categories */}
       <section>
@@ -118,7 +128,7 @@ function HomePage() {
                 className="group rounded-xl border border-blue-100 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-md"
               >
                 <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-50 text-xl text-blue-600 transition group-hover:bg-blue-100">
-                  ◈
+                 ❇
                 </div>
 
                 <h3 className="font-semibold text-slate-900 group-hover:text-blue-700">

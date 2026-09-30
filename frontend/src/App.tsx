@@ -13,10 +13,13 @@ import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import OrdersPage from "./pages/OrdersPage";
+import ProfilePage from "./pages/ProfilePage";
 
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminCategoriesPage from "./pages/admin/AdminCategoriesPage";
 import AdminProductsPage from "./pages/admin/AdminProductsPage";
+import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
 import AdminLayout from "./layouts/AdminLayout";
 
 
@@ -35,6 +38,7 @@ function App() {
  
         {/* rutas que requieren autenticación */}
           <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/orders" element={<OrdersPage />} />
             <Route path="/orders/:id" element={<OrderDetailPage />} />
@@ -47,6 +51,8 @@ function App() {
              <Route path="/admin"element={<AdminDashboardPage />}/>
              <Route path="/admin/products"element={<AdminProductsPage />}/>
              <Route path="/admin/categories" element={<AdminCategoriesPage />} />
+             <Route path="/admin/orders" element={<AdminOrdersPage />} />
+              <Route path="/admin/users" element={<AdminUsersPage />} />
             </Route>
           </Route>
         </Route>
