@@ -18,7 +18,7 @@ app.use(express.json());
 //para permitir solicitudes desde el frontend
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
   })
 );
 
