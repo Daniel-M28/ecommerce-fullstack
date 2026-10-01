@@ -187,6 +187,15 @@ pnpm prisma migrate dev
 pnpm prisma migrate deploy
 ```
 
+## Deployment
+
+La aplicación fue desplegada en un entorno de producción utilizando servicios cloud independientes para cada componente:
+
+Frontend: Vercel
+Backend: Render
+Base de datos: Supabase PostgreSQL
+Repositorio y control de versiones: GitHub
+
 ---
 
 ## Capturas de pantalla
