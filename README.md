@@ -37,7 +37,7 @@ El proyecto está orientado a la implementación de buenas prácticas de desarro
 
 ---
 
-## ✨ Características
+##  Características
 
 * Registro y autenticación de usuarios
 * Autorización basada en roles
@@ -56,7 +56,7 @@ El proyecto está orientado a la implementación de buenas prácticas de desarro
 
 ---
 
-## 🏗️ Arquitectura
+## Arquitectura
 
 El proyecto utiliza una arquitectura separada entre frontend y backend, permitiendo mantener una clara separación de responsabilidades.
 
@@ -85,7 +85,7 @@ La aplicación utiliza relaciones entre entidades como:
 
 ---
 
-## 📡 API
+## API
 
 El backend expone una API REST para gestionar los principales recursos de la aplicación.
 
@@ -134,7 +134,7 @@ Los endpoints de carrito, usuarios y pedidos siguen la misma arquitectura REST d
 
 ---
 
-## 🔐 Autenticación y autorización
+##  Autenticación y autorización
 
 El sistema utiliza **JWT (JSON Web Tokens)** para la autenticación de usuarios.
 
@@ -144,7 +144,7 @@ El acceso a determinadas operaciones administrativas está protegido mediante mi
 
 ---
 
-## 🗄️ Modelo de datos
+## Modelo de datos
 
 El sistema utiliza PostgreSQL y Prisma para gestionar las relaciones entre las principales entidades.
 
@@ -228,13 +228,13 @@ pnpm prisma migrate deploy
 
 ---
 
-## 📌 Estado del proyecto
+## Estado del proyecto
 
 Proyecto desarrollado como parte de mi portafolio profesional para demostrar experiencia práctica en desarrollo **Full Stack** utilizando tecnologías modernas del ecosistema JavaScript/TypeScript.
 
 ---
 
-## 👨‍💻 Autor
+## Autor
 
 **Daniel Murillo**
 
