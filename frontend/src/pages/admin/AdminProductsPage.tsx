@@ -21,10 +21,6 @@ interface ProductResponse {
   product: Product;
 }
 
-interface ImagesResponse {
-  images: Product["images"];
-}
-
 interface ProductFormData {
   name: string;
   description: string;
